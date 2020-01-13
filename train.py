@@ -11,9 +11,6 @@ from torch import optim
 from generate_data import ConnectDataset
 
 
-# 6 * 7 * 3 = 126
-# + 1 for player move ??
-# = 127
 class Net(nn.Module):
   def __init__(self):
     super(Net, self).__init__()
@@ -52,15 +49,24 @@ class Net(nn.Module):
     x = torch.tanh(x)
     return x
 
-
+# batch size of 4
+# returns 4 - 2,1 outputs per board??
+# not sure what the hell that means
 def train(model, dataloader, optimizer, criterion, epochs=5):
+  model.train()
+
   for i, board in enumerate(dataloader):
-    print(board[0])
+    optimizer.zero_grad()
     board = board.to(device)
     out = model(board)
-    print(out)
-    print(out.shape)
+    # need some way to map a 2,1 tensor
+    # output to a target tensor
+    # would mean need some sort of search tree??
+
+
     break
+    loss.backward()
+    optimizer.step()
 
 
 if __name__ == '__main__':
@@ -75,7 +81,7 @@ if __name__ == '__main__':
 
   net = Net().to(device)
   optimizer = optim.Adam(net.parameters(), lr=learning_rate)
-  criterion = torch.nn.CrossEntropyLoss
+  criterion = torch.nn.CrossEntropyLoss()
 
   train(net, dataloader, optimizer, criterion)
 
