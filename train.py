@@ -46,22 +46,20 @@ class Net(nn.Module):
     x = F.relu(self.c2(x))
     x = F.relu(self.c3(x))
 
+    # reshape to 8, 128
     x = x.view(-1, 128)
     x = self.last(x)
-
-    # cant use column classification because
-    # no labels for "best move", would need
-    # search tree ??
-    # not sure how to work with this output
-    # in the meantime
-    return torch.tanh(x)
+    x = torch.tanh(x)
+    return x
 
 
 def train(model, dataloader, optimizer, criterion, epochs=5):
   for i, board in enumerate(dataloader):
+    print(board[0])
     board = board.to(device)
     out = model(board)
     print(out)
+    print(out.shape)
     break
 
 
