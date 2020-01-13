@@ -38,18 +38,17 @@ class Net(nn.Module):
 def train(model, dataloader, optimizer, criterion, epochs=5):
   model.train()
 
-  for i, (board, target) in enumerate(dataloader):
-    optimizer.zero_grad()
-    board = board.to(device)
-    print(board)
-    out = model(board)
-    print(out)
-    print(out.shape)
+  for epoch in range(epochs):
+    for i, (board, target) in enumerate(dataloader):
+      optimizer.zero_grad()
+      board = board.to(device)
+      target = target.to(device)
+      out = model(board)
 
-    break
-    loss = criterion(out, target)
-    loss.backward()
-    optimizer.step()
+      loss = criterion(out, target)
+      loss.backward()
+      print(loss.item())
+      optimizer.step()
 
 
 if __name__ == '__main__':

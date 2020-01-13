@@ -20,9 +20,12 @@ def generate_classes():
     res = res[0]
     if res == 'win':
       targets[row, 0] = 1
+  
+  # convert to tensor of type float
+  out = torch.from_numpy(targets).to(torch.float32)
 
   # spit it back
-  return targets
+  return out
 
 
 def generate_dataset():
