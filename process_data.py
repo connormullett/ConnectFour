@@ -5,17 +5,17 @@ import torch
 import numpy as np
 
 
+# take df from csv and output
+# to numpy 'npz' file format
+# to be used by 'generate_data.py'
+
+# statuses from player 'x' perspective
+# win = 1, loss = 0, draw = 0
+df = pd.read_csv('./data/connect-4.data')
+
+
 def generate_dataset():
-  # take df from csv and output
-  # to numpy 'npz' file format
-  # to be used by 'generate_data.py'
-  df = pd.read_csv('./data/connect-4.data')
-
-
-  # statuses from player 'x' perspective
-  # win = 1, loss = 0, draw = 0
   boards = df.drop(labels=['win'], axis=1)
-  classes = df.loc[:, 'win']
 
   boards_matrix = boards.values
 
@@ -54,5 +54,5 @@ def generate_dataset():
   np.save('./processed/boards.npy', dataset)
 
 if __name__ == '__main__':
-  generate_dataset()
+  generate_classes()
 

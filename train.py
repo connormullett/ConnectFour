@@ -1,11 +1,14 @@
+#!/usr/bin/env python
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from torch import optim
+
+from generate_data import ConnectDataset
 
 
 # 6 * 7 * 3 = 126
@@ -46,15 +49,35 @@ class Net(nn.Module):
     x = x.view(-1, 128)
     x = self.last(x)
 
-    # output layer maybe classify 7 columns for best moves??
-    # as 7 columns and outputs which coumn to drop piece
-    # maybe use softmax??
+    # cant use column classification because
+    # no labels for "best move", would need
+    # search tree ??
+    # not sure how to work with this output
+    # in the meantime
     return torch.tanh(x)
 
+
+def train(model, dataloader, optimizer, criterion, epochs=5):
+  for i, board in enumerate(dataloader):
+    board = board.to(device)
+    out = model(board)
+    print(out)
+    break
+
+
 if __name__ == '__main__':
-  net = Net()
-  board = torch.randn(3, 6, 7)
-  print(board)
-  out = net(board)
-  print(out)
+  device = "cuda" if torch.cuda.is_available else "cpu"
+
+  data = ConnectDataset()
+  dataloader = DataLoader(data, batch_size=4,
+      shuffle=True, num_workers=4)
+
+  # hyper parameters
+  learning_rate = 0.01
+
+  net = Net().to(device)
+  optimizer = optim.Adam(net.parameters(), lr=learning_rate)
+  criterion = torch.nn.CrossEntropyLoss
+
+  train(net, dataloader, optimizer, criterion)
 
