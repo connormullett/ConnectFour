@@ -5,16 +5,28 @@ import torch
 import numpy as np
 
 
-# take df from csv and output
-# to numpy 'npz' file format
-# to be used by 'generate_data.py'
-
-# statuses from player 'x' perspective
-# win = 1, loss = 0, draw = 0
 df = pd.read_csv('./data/connect-4.data')
 
 
+def generate_classes():
+  # grab target column
+  classes = df[['win']]
+
+  # create the np matrix for saving values
+  targets = np.zeros((67556, 1))
+  
+  # add values to targets based on classes values
+  for row, res in enumerate(classes.values):
+    res = res[0]
+    if res == 'win':
+      targets[row, 0] = 1
+
+  # spit it back
+  return targets
+
+
 def generate_dataset():
+  # TODO: need a way to skip over invalid games
   boards = df.drop(labels=['win'], axis=1)
 
   boards_matrix = boards.values
@@ -53,6 +65,7 @@ def generate_dataset():
 
   np.save('./processed/boards.npy', dataset)
 
+
 if __name__ == '__main__':
-  generate_classes()
+  targets = generate_classes()
 
