@@ -55,7 +55,8 @@ if __name__ == '__main__':
   device = "cuda" if torch.cuda.is_available else "cpu"
 
   data = ConnectDataset()
-  dataloader = DataLoader(data, shuffle=True, num_workers=4)
+  dataloader = DataLoader(data, batch_size=256,
+      shuffle=True, num_workers=4)
 
   # hyper parameters
   learning_rate = 0.01
@@ -65,4 +66,5 @@ if __name__ == '__main__':
   criterion = torch.nn.MSELoss()
 
   train(net, dataloader, optimizer, criterion)
+  torch.save(net.state_dict(), './model.pth')
 
