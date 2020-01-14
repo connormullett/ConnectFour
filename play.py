@@ -12,12 +12,6 @@ def request_move(model, board):
   return predict(model, board)
 
 
-def update_model():
-  # takes in a list of moves for winning model
-  # updates model with those moves
-  pass
-
-
 def save_model(model):
   PATH = './nets/model.pth'
   torch.save(model.state_dict(), PATH)
@@ -35,7 +29,6 @@ def play():
 
   # foo=0, bar=1
   foos_turn = True
-
   game = connect_four.Game()
 
   while not game.won():
@@ -65,9 +58,9 @@ def play():
         prediction[column] = 0.
 
 
-    print('pred: ', prediction)
-    print('move: ', move)
-    print(game.to_tensor())
+    # print('pred: ', prediction)
+    # print('move: ', move)
+    # print(game.to_tensor())
     game.print_board()
 
     # switch turn
@@ -79,6 +72,16 @@ def play():
       bar_moves.append(move)
       bar_preds.append(prediction)
       foos_turn = True
+
+
+  # if its no longer foos turn, he won
+  if not foos_turn:
+    # send moves and predictions to update the model
+    print('foo won')
+    update_model(net, foo_moves, foo_preds)
+  else:
+    print('bar won')
+    update_model(net, bar_moves, bar_preds)
 
 
 if __name__ == '__main__':

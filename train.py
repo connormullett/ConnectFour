@@ -38,7 +38,8 @@ def predict(model, board):
 
 # when a model wins, send the winning moves/preds
 # to train the model and repeat game
-def update_model(model, moves, predictions, optimizer):
+def update_model(model, moves, predictions):
+  optimizer = optim.Adam(model.parameters(), lr=0.01)
   for i, tensor in enumerate(moves):
 
     # run it through the predictions it made
@@ -58,7 +59,6 @@ if __name__ == '__main__':
   learning_rate = 0.01
 
   net = Net().to(device)
-  optimizer = optim.Adam(net.parameters(), lr=learning_rate)
   criterion = torch.nn.MSELoss()
 
   train(optimizer, criterion)
