@@ -27,23 +27,20 @@ class Game:
     self.board = [[NONE] * rows for _ in range(cols)]
 
   def to_tensor(self):
-    # self.board = 7,6
-    red = np.zeros(42)
-    yellow = np.zeros(42)
-    blank = np.zeros(42)
+    # create boards and transpose
+    red = np.zeros((7, 6)).transpose()
+    yellow = np.zeros((7,6)).transpose()
+    blank = np.zeros((7,6)).transpose()
+    board = np.asarray(self.board).reshape((7, 6)).transpose()
 
-    board = np.asarray(self.board).reshape(42)
-    for i, cell in enumerate(board[0]):
-      if cell == 'R':
-        red[i] = 1
-      elif cell == 'Y':
-        yellow[i] = 1
-      else:
-        blank[i] = 1
-
-    red = red.reshape((6, 7))
-    yellow = yellow.reshape((6, 7))
-    blank = blank.reshape((6, 7))
+    for i, row in enumerate(board):
+      for j, cell in enumerate(row):
+        if cell == 'R':
+          red[i, j] = 1
+        elif cell == 'Y':
+          yellow[i, j] = 1
+        else:
+          blank[i, j] = 1
 
     out = np.stack((blank, yellow, red), axis=0)
     return torch.from_numpy(out).to(torch.float32)
@@ -93,7 +90,7 @@ if __name__ == '__main__':
   #   row = input('{}\'s turn: '.format('Red' if turn == RED else 'Yellow'))
   #   g.insert(int(row), turn)
   #   turn = YELLOW if turn == RED else RED
-  board = g.to_tensor()
-  g.insert(1, RED)
-  g.insert(5, YELLOW)
-  print(g.board)
+  g.insert(0, RED)
+  g.insert(0, YELLOW)
+  print(g.to_tensor())
+  g.print_board()
