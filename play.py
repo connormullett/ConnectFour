@@ -45,26 +45,28 @@ def play():
 
     # get a prediction/move
     prediction = request_move(net, board)
-    max_value = torch.max(prediction)
-    move = np.zeros((1, 7))
 
-    for i, tensor in enumerate(prediction):
-      if tensor == max_value:
-        move[:, i] = 1
+    while(1):
+      max_value = torch.max(prediction)
+      move = np.zeros((1, 7))
+      for i, tensor in enumerate(prediction):
+        if tensor == max_value:
+          move[:, i] = 1
+          prediction[i] = 0.
 
-    # insert the piece
-    # get column num and insert at column
-    move = move.tolist()
-    column = move[0].index(1.)
+      move = move.tolist()
+      column = move[0].index(1.)
 
-    if foos_turn:
-      game.insert(column, RED)
-    else:
-      game.insert(column, YELLOW)
+      try:
+        game.insert(column, RED if foos_turn else YELLOW)
+        break
+      except Exception as e:
+        # zero prediction@column and get new max
+        prediction[column] = 0.
+
 
     print('pred: ', prediction)
     print('move: ', move)
-    # game.print_board()
     print(game.to_tensor())
     game.print_board()
 
