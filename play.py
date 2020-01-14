@@ -90,10 +90,12 @@ def play(net):
 
 
 if __name__ == '__main__':
-  games = 10
+  games = 100
 
+  net = Net()
   for game_num in range(games+1):
-    net = Net()
+
+    # play the game
     play(net)
 
     # save every 5 games
