@@ -28,19 +28,18 @@ class Game:
 
   def to_tensor(self):
     # self.board = 7,6
-    red = np.zeros((1, 42))
-    yellow = np.zeros((1, 42))
-    blank = np.zeros((1, 42))
+    red = np.zeros(42)
+    yellow = np.zeros(42)
+    blank = np.zeros(42)
 
-    board = np.asarray(self.board).reshape(1, 42)
+    board = np.asarray(self.board).reshape(42)
     for i, cell in enumerate(board[0]):
-      cell = cell[0]
-      if cell == '.':
-        blank[0, i] = 1
       if cell == 'R':
-        red[0, i] = 1
-      if cell == 'Y':
-        yellow[0, i] = 1
+        red[i] = 1
+      elif cell == 'Y':
+        yellow[i] = 1
+      else:
+        blank[i] = 1
 
     red = red.reshape((6, 7))
     yellow = yellow.reshape((6, 7))
@@ -95,4 +94,6 @@ if __name__ == '__main__':
   #   g.insert(int(row), turn)
   #   turn = YELLOW if turn == RED else RED
   board = g.to_tensor()
-  print(board)
+  g.insert(1, RED)
+  g.insert(5, YELLOW)
+  print(g.board)
