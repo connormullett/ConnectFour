@@ -16,7 +16,7 @@ class Net(nn.Module):
     self.a3 = nn.Conv2d(2, 1, kernel_size=1)
 
     self.fc = nn.Linear(12, 7)
-    self.softmax = nn.Softmax()
+    self.softmax = nn.Softmax(dim=0)
 
   def forward(self, x):
     x = x.view(-1, 3, 6, 7)
@@ -38,12 +38,15 @@ def predict(model, board):
 
 # when a model wins, send the winning moves/preds
 # to train the model and repeat game
-def update_model(model, moves, predictions):
+def update_model(model, boards, moves, winning_moves, predictions):
   optimizer = optim.Adam(model.parameters(), lr=0.01)
   for i, tensor in enumerate(moves):
+    tensor = torch.tensor(tensor).flatten()
+
+    input = boards[i]
 
     # run it through the predictions it made
-    out = model(predictions[i])
+    out = model(input)
 
     # backprop with the moves it made
     model.zero_grad()
