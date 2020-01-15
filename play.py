@@ -3,6 +3,7 @@
 from train import Net, update_model, predict
 import numpy as np
 import torch
+import random
 import connect_four
 
 from datetime import datetime
@@ -25,6 +26,7 @@ def view_parameters(layer):
 
 def play(net):
 
+
   # player foo and bar locked in eternal battle
   foo_moves = []
   bar_moves = []
@@ -35,7 +37,9 @@ def play(net):
   tensor_boards = []
   moves = []
 
-  # foo=0, bar=1
+  # 20% of bar's moves are random
+  bars_random_move_probability = 0.2
+
   foos_turn = True
   game = connect_four.Game()
 
@@ -44,12 +48,20 @@ def play(net):
     # encode boards current state to tensor
     board = game.to_tensor()
 
-    # get a prediction/move
-    prediction = request_move(net, board)
-
     while(1):
-      max_value = torch.max(prediction)
-      move = np.zeros((1, 7))
+      # look to create a random move only on bars turn
+      if bars_random_move_probability > random.random()\
+          and not foos_turn:
+        move = np.zeros((1, 7))
+        rand = random.randint(0, 7)
+        move[0][rand] = 1
+        prediction = torch.from_numpy(move).flatten()
+      else:
+        # bar plays normally
+        prediction = request_move(net, board)
+        max_value = torch.max(prediction)
+        move = np.zeros((1, 7))
+
       for i, tensor in enumerate(prediction):
         if tensor == max_value:
           move[:, i] = 1
@@ -60,11 +72,12 @@ def play(net):
 
       try:
         game.insert(column, RED if foos_turn else YELLOW)
-        # game.print_board()
         break
       except Exception as e:
         # zero prediction@column and get new max
         prediction[column] = 0.
+
+      game.print_board()
 
     # switch turn
     if foos_turn:
@@ -79,6 +92,7 @@ def play(net):
     moves.append(move)
     tensor_boards.append(board)
 
+  game.print_board()
 
   # if its no longer foos turn, he won
   good_moves = foo_moves if not foos_turn else bar_moves
@@ -95,11 +109,7 @@ if __name__ == '__main__':
   for game_num in range(games+1):
 
     # play the game
-    view_parameters(net.fc)
     play(net)
-    view_parameters(net.fc)
 
-    # save every 5 games
-    # if game_num % 5 == 0:
-    #   save_model(net)
+  save_model(net)
 

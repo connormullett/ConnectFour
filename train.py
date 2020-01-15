@@ -31,13 +31,14 @@ class Net(nn.Module):
 
 
 # call this until win
+# backprop and optimizing comes later
 def predict(model, board):
   out = model(board)
   return out
 
 
 # when a model wins, send the winning moves/preds
-# to train the model and repeat game
+# to train the model and repeat the game
 def update_model(model, boards, moves, winning_moves, predictions):
   optimizer = optim.Adam(model.parameters(), lr=0.01)
   for i, tensor in enumerate(moves):
@@ -45,15 +46,16 @@ def update_model(model, boards, moves, winning_moves, predictions):
 
     input = boards[i]
 
-    # run it through the predictions it made
-    out = model(input)
+    # only pass moves winning model made
+    if i % 2:
+      out = model(input)
 
-    # backprop with the moves it made
-    model.zero_grad()
-    out.backward(tensor)
+      # backprop with the moves it made
+      model.zero_grad()
+      out.backward(tensor)
 
-    # step the optimizer
-    optimizer.step()
+      # step the optimizer
+      optimizer.step()
 
 
 if __name__ == '__main__':
