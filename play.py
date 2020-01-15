@@ -19,9 +19,8 @@ def save_model(model):
   torch.save(model.state_dict(), PATH)
 
 
-def view_parameters(model):
-  for param in model.parameters():
-    print(param.data, param.size())
+def view_parameters(layer):
+  print(list(layer.parameters()))
 
 
 def play(net):
@@ -61,7 +60,7 @@ def play(net):
 
       try:
         game.insert(column, RED if foos_turn else YELLOW)
-        game.print_board()
+        # game.print_board()
         break
       except Exception as e:
         # zero prediction@column and get new max
@@ -96,9 +95,11 @@ if __name__ == '__main__':
   for game_num in range(games+1):
 
     # play the game
+    view_parameters(net.fc)
     play(net)
+    view_parameters(net.fc)
 
     # save every 5 games
-    if game_num % 5 == 0:
-      save_model(net)
+    # if game_num % 5 == 0:
+    #   save_model(net)
 
