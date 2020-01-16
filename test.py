@@ -29,8 +29,8 @@ def main():
   while not g.won():
     board = g.to_tensor(red)
 
-    prediction = request_move(net, board, chance=0.2 if red else 0.0)
-    print(prediction)
+    prediction = request_move(net, board, chance=0.5 if red else 0.25)
+    # print(prediction)
     max_value = torch.max(prediction)
     move = np.zeros((1, 7))
 
