@@ -49,7 +49,7 @@ def update_model(model, boards, moves, predictions):
 
     out = model(input)
 
-    tensor = torch.tensor([x * (i / len(moves)) for x in tensor])
+    tensor = torch.tensor([x * i for x in tensor])
     out.backward(tensor)
 
     optimizer.step()

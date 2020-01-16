@@ -20,9 +20,8 @@ def request_move(model, board, chance=2):
     return predict(model, board)
 
 
-def save_model(name, model):
-  current = datetime.now().strftime("%H-%M-%S")
-  PATH = './nets/model-%s-%s.pth' % (name, current)
+def save_model(model):
+  PATH = './nets/model.pth' % (name, current)
   torch.save(model.state_dict(), PATH)
 
 
@@ -30,7 +29,7 @@ def view_parameters(layer):
   print(list(layer.parameters()))
 
 
-def play(net_one, net_two):
+def play(net):
 
   # player foo and bar locked in eternal battle
   foo_moves = []
@@ -51,12 +50,17 @@ def play(net_one, net_two):
 
     if foos_turn:
       game.print_board()
-      x = int(input())
+      while(1):
+        try:
+          x = int(input())
+          break
+        except Exception:
+          continue
       one_hot = np.zeros(7)
       one_hot[x] = 1
       prediction = torch.tensor(one_hot)
     else:
-      prediction = request_move(net_two, board)
+      prediction = request_move(net, board)
 
     max_value = torch.max(prediction)
     move = np.zeros((1, 7))
@@ -103,35 +107,21 @@ def play(net_one, net_two):
   bad_preds = foo_preds if foos_turn else bar_preds
   bad_boards = foo_boards if foos_turn else bar_boards
 
-  # send moves and predictions to update the model
-  if not foos_turn:
-    update_model(net_one, good_boards, good_moves, good_preds)
-    update_model(net_two, bad_boards, bad_moves, bad_preds)
-  else:
-    update_model(net_two, good_boards, good_moves, good_preds)
-    update_model(net_one, bad_boards, bad_moves, bad_preds)
+  update_model(net, good_boards, good_moves, good_preds)
+  update_model(net, bad_boards, bad_moves, bad_preds)
 
 
 if __name__ == '__main__':
-  games = 1000
-
-  # net = Net()
   games = int(sys.argv[1])
-  if len(sys.argv) > 3:
-    PATH_ONE = sys.argv[2]
-    PATH_TWO = sys.argv[3]
 
-    net_one = Net()
-    net_one.load_state_dict(torch.load(PATH_ONE))
-
-    net_two = Net()
-    net_two.load_state_dict(torch.load(PATH_TWO))
+  if len(sys.argv) > 2:
+    net = Net()
+    net.load_state_dict(torch.load(sys.argv[2]))
   else:
-    net_one = Net()
-    net_two = Net()
+    net = Net()
 
   for game_num in range(1,games+1):
-    play(net_one, net_two)
+    play(net)
 
-  save_model('two',  net_two)
+    save_model(net)
 
