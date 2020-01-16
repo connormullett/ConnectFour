@@ -26,7 +26,7 @@ class Game:
     self.win = required_to_win
     self.board = [[NONE] * rows for _ in range(cols)]
 
-  def to_tensor(self):
+  def to_tensor(self, turn=True):
     # create boards and transpose
     red = np.zeros((7, 6)).transpose()
     yellow = np.zeros((7,6)).transpose()
@@ -42,8 +42,13 @@ class Game:
         else:
           blank[i, j] = 1
 
-    out = np.stack((blank, yellow, red), axis=0)
+    if turn:
+      out = np.stack((yellow, blank, red), axis=0)
+    else:
+      out = np.stack((red, blank, yellow), axis=0)
+
     return torch.from_numpy(out).to(torch.float32)
+
 
   def insert(self, column, color):
     c = self.board[column]

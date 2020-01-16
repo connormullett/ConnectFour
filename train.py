@@ -47,15 +47,14 @@ def update_model(model, boards, moves, winning_moves, predictions):
     input = boards[i]
 
     # only pass moves winning model made
-    if i % 2:
-      out = model(input)
+    out = model(input)
 
-      # backprop with the moves it made
-      model.zero_grad()
-      out.backward(tensor)
+    # backprop with the moves it made
+    model.zero_grad()
+    out.backward(tensor)
 
-      # step the optimizer
-      optimizer.step()
+    # step the optimizer
+    optimizer.step()
 
 
 if __name__ == '__main__':

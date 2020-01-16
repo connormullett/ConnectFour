@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from train import Net, update_model, predict
+import sys
 import numpy as np
 import torch
 import random
@@ -10,8 +11,13 @@ from datetime import datetime
 from connect_four import RED, YELLOW
 
 
-def request_move(model, board):
-  return predict(model, board)
+def request_move(model, board, chance=0.2):
+  use_random = random.random() < chance
+  if use_random:
+    prediction = torch.rand(7) 
+    return prediction
+  else:
+    return predict(model, board)
 
 
 def save_model(model):
@@ -26,7 +32,6 @@ def view_parameters(layer):
 
 def play(net):
 
-
   # player foo and bar locked in eternal battle
   foo_moves = []
   bar_moves = []
@@ -37,47 +42,36 @@ def play(net):
   tensor_boards = []
   moves = []
 
-  # 20% of bar's moves are random
-  bars_random_move_probability = 0.2
-
   foos_turn = True
   game = connect_four.Game()
 
+  # move
+
   while not game.won():
 
-    # encode boards current state to tensor
-    board = game.to_tensor()
+    board = game.to_tensor(foos_turn)
 
-    while(1):
-      # look to create a random move only on bars turn
-      if bars_random_move_probability > random.random()\
-          and not foos_turn:
-        move = np.zeros((1, 7))
-        rand = random.randint(0, 7)
-        move[0][rand] = 1
-        prediction = torch.from_numpy(move).flatten()
-      else:
-        # bar plays normally
-        prediction = request_move(net, board)
-        max_value = torch.max(prediction)
-        move = np.zeros((1, 7))
+    prediction = request_move(net, board, chance=1 if foos_turn else 0.0)
+    max_value = torch.max(prediction)
+    move = np.zeros((1, 7))
 
-      for i, tensor in enumerate(prediction):
-        if tensor == max_value:
-          move[:, i] = 1
-          prediction[i] = 0.
+    for i, element in enumerate(prediction):
+      if element == max_value:
+        move[:, i] = 1
+        prediction[i] = 0.
 
-      move = move.tolist()
-      column = move[0].index(1.)
+    column = move.tolist()[0].index(1.)
 
+    for iter in range(7):
       try:
         game.insert(column, RED if foos_turn else YELLOW)
         break
       except Exception as e:
-        # zero prediction@column and get new max
-        prediction[column] = 0.
-
+        column = (column + 1) % 7
+    else:
       game.print_board()
+      return
+
 
     # switch turn
     if foos_turn:
@@ -93,7 +87,6 @@ def play(net):
     tensor_boards.append(board)
 
   game.print_board()
-
   # if its no longer foos turn, he won
   good_moves = foo_moves if not foos_turn else bar_moves
   good_preds = foo_preds if not foos_turn else bar_preds
@@ -103,9 +96,17 @@ def play(net):
 
 
 if __name__ == '__main__':
-  games = 100
+  games = 1000
 
-  net = Net()
+  # net = Net()
+  games = int(sys.argv[1])
+  if len(sys.argv) > 2:
+    PATH = sys.argv[2]
+    net = Net()
+    net.load_state_dict(torch.load(PATH))
+  else:
+    net = Net()
+
   for game_num in range(games+1):
 
     # play the game
