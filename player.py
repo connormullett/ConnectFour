@@ -45,14 +45,16 @@ def play(net_one, net_two):
   foos_turn = True
   game = connect_four.Game()
 
-  # move
-
   while not game.won():
 
     board = game.to_tensor(foos_turn)
 
     if foos_turn:
-      prediction = request_move(net_one, board)
+      game.print_board()
+      x = int(input())
+      one_hot = np.zeros(7)
+      one_hot[x] = 1
+      prediction = torch.tensor(one_hot)
     else:
       prediction = request_move(net_two, board)
 
@@ -131,6 +133,5 @@ if __name__ == '__main__':
   for game_num in range(1,games+1):
     play(net_one, net_two)
 
-  save_model('one', net_one)
   save_model('two',  net_two)
 

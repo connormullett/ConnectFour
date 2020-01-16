@@ -9,7 +9,7 @@ from connect_four import Game, RED, YELLOW
 from train import predict
 
 
-def request_move(model, board, chance):
+def request_move(model, board, chance=0.143):
   use_random = random.random() < chance
   if use_random:
     prediction = torch.rand(7) 
@@ -29,8 +29,7 @@ def main():
   while not g.won():
     board = g.to_tensor(red)
 
-    prediction = request_move(net, board, chance=0.5 if red else 0.25)
-    # print(prediction)
+    prediction = request_move(net, board, chance=1 if red else 0.0)
     max_value = torch.max(prediction)
     move = np.zeros((1, 7))
 

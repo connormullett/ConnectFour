@@ -39,7 +39,7 @@ def predict(model, board):
 
 # when a model wins, send the winning moves/preds
 # to train the model and repeat the game
-def update_model(model, boards, moves, winning_moves, predictions):
+def update_model(model, boards, moves, predictions):
   optimizer = optim.Adam(model.parameters(), lr=0.01)
   for i, tensor in enumerate(moves):
     model.zero_grad()
@@ -48,6 +48,8 @@ def update_model(model, boards, moves, winning_moves, predictions):
     input = boards[i]
 
     out = model(input)
+
+    tensor = torch.tensor([x * (i / len(moves)) for x in tensor])
     out.backward(tensor)
 
     optimizer.step()
