@@ -14,14 +14,14 @@ from connect_four import RED, YELLOW
 def request_move(model, board, chance=2):
   use_random = random.random() < chance
   if use_random:
-    prediction = torch.rand(7) 
+    prediction = torch.rand(7)
     return prediction
   else:
     return predict(model, board)
 
 
 def save_model(model):
-  PATH = './nets/model.pth' % (name, current)
+  PATH = './nets/model.pth'
   torch.save(model.state_dict(), PATH)
 
 
