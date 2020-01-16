@@ -53,6 +53,7 @@ def play(net):
       while(1):
         try:
           x = int(input())
+          assert x < 7 and x >= 0
           break
         except Exception:
           continue
@@ -108,7 +109,7 @@ def play(net):
   bad_boards = foo_boards if foos_turn else bar_boards
 
   update_model(net, good_boards, good_moves, good_preds)
-  update_model(net, bad_boards, bad_moves, bad_preds)
+  # update_model(net, bad_boards, bad_moves, bad_preds)
 
 
 if __name__ == '__main__':
